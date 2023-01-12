@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ask.mapper.AskMapper">
+   <select id="selectAskList" resultType="ask.dto.AskDto">
+      select ask_idx, title, hit_cnt, regist_id,
+             date_format(regist_dt, '%Y-%m-%d %H:%i:%s') as regist_dt
+        from t_ask
+       where deleted_yn = 'N'
+        order by ask_idx desc
+   </select> 
+   
+   <insert id="insertAsk" parameterType="ask.dto.AskDto">
+      insert into t_ask (title, contents, regist_dt, regist_id)
+      values ( #{title}, #{contents}, now(), #{registId} )
+   </insert>
+   
+    
+   <update id="updateHitCount" parameterType="int" >
+         update t_ask
+               set hit_cnt = hit_cnt + 1
+          where ask_idx = #{askIdx}
+   </update>
+
+   
+   <select id="selectAskDetail" parameterType="int" resultType="ask.dto.AskDto">
+      select ask_idx, title, contents, hit_cnt,
+             date_format(regist_dt, '%Y-%m-%d %H:%i:%s') as regist_dt, regist_id
+        from t_ask
+       where deleted_yn = 'N' and ask_idx = #{askIdx}             
+   </select>
+   
+   <update id="updateAsk" parameterType="ask.dto.AskDto">
+      update t_ask
+         set title = #{title}, 
+             contents = #{contents}, 
+             updated_dt = now(), 
+             updated_id = 'admin'
+       where ask_idx = #{askIdx}        
+   </update>
+   
+   <delete id="deleteAsk" parameterType="int">
+      update t_ask
+         set deleted_yn = 'Y', 
+             updated_dt = now(), 
+             updated_id = 'admin'
+       where ask_idx = #{askIdx}        
+   </delete>
+   
+   
+</mapper>
